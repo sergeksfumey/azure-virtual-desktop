@@ -176,7 +176,7 @@ The design demonstrates how legacy VPN and on-premises VDI can be modernised thr
 ---
 
 ## Repository Structure
-
+```
 azure-virtual-desktop/
 ├── terraform/
 │   ├── modules/
@@ -200,7 +200,7 @@ azure-virtual-desktop/
 │   └── byod-access-guide.md
 └── pipelines/
     └── azure-pipelines.yml
-
+```
 ---
 
 ## Future Evolution
