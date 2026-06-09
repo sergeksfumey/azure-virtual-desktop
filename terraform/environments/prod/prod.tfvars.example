@@ -1,0 +1,12 @@
+# Copy to prod.tfvars -- DO NOT commit to version control
+
+resource_group_name          = "rg-avd-prod"
+location                     = "westeurope"
+max_sessions_per_host        = 10
+initial_session_host_count   = 3
+session_host_vm_size         = "Standard_D4s_v5"
+avd_users_group_object_id    = "<avd-users-group-object-id>"
+admin_username               = "avdadmin"
+admin_password               = "<strong-password>"
+gallery_image_id             = "<compute-gallery-image-resource-id>"
+fslogix_storage_account_name = "<globally-unique-name>"

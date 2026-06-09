@@ -1,0 +1,25 @@
+// FSLogix Profile Mount Health
+// Data source: Event (FSLogix event log via Azure Monitor Agent)
+// EventID 27: Profile loaded successfully
+// EventID 25: Profile failed to load
+// EventID 26: Profile unloaded
+
+Event
+| where TimeGenerated > ago(1h)
+| where Source == "Microsoft-FSLogix-Apps"
+| extend
+    EventType    = case(
+        EventID == 27, "ProfileMounted",
+        EventID == 25, "ProfileFailed",
+        EventID == 26, "ProfileUnloaded",
+        "Other"
+    ),
+    UserName     = extract(@"for (\S+)", 1, RenderedDescription),
+    ContainerPath = extract(@"VHD location: (.+?)\.", 1, RenderedDescription)
+| summarize
+    MountCount    = countif(EventType == "ProfileMounted"),
+    FailureCount  = countif(EventType == "ProfileFailed"),
+    UnloadCount   = countif(EventType == "ProfileUnloaded")
+    by bin(TimeGenerated, 15m)
+| extend FailureRate = round(100.0 * FailureCount / (MountCount + FailureCount), 1)
+| order by TimeGenerated desc

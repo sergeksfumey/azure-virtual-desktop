@@ -1,0 +1,24 @@
+// AVD Session Health Monitoring
+// Data source: WVDConnections, WVDCheckpoints (AVD diagnostic logs)
+// Detects: connection failures, high latency, session errors
+
+WVDConnections
+| where TimeGenerated > ago(1h)
+| where State == "Connected" or State == "Completed"
+| extend
+    ConnectionDuration = datetime_diff("second", TimeGenerated, StartTime),
+    UserName           = tostring(split(UserName, "@")[0]),
+    SessionHostName    = tostring(split(SessionHostName, ".")[0])
+| summarize
+    TotalSessions     = count(),
+    AvgDurationSec    = avg(ConnectionDuration),
+    MaxDurationSec    = max(ConnectionDuration),
+    UniqueUsers       = dcount(UserName)
+    by SessionHostName, bin(TimeGenerated, 15m)
+| order by TimeGenerated desc
+
+// Connection failures in last hour
+// WVDErrors
+// | where TimeGenerated > ago(1h)
+// | summarize ErrorCount = count() by ErrorMessage, bin(TimeGenerated, 15m)
+// | order by ErrorCount desc
